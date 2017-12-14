@@ -1,3 +1,7 @@
 import './styles/application.scss';
+import $ from 'jquery';
+import Editor from './editor/editor';
 
-console.log('hello');
+const editor = new Editor({
+  el: $('#editor')
+}).init();
