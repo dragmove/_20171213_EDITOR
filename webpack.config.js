@@ -1,56 +1,80 @@
 const path = require('path'),
   webpack = require('webpack'),
   ExtractTextPlugin = require('extract-text-webpack-plugin'),
-  dirname = path.resolve('./');
+  dirName = path.resolve('./');
 
 const vendorModules = ['jquery'];
 
-function createConfig(isDebug) {
-  const devTool = (isDebug) ? 'eval-source-map' : 'source-map';
-
-  let externals = [],
-
+function createConfig(isDebug, options = {banner: ''}) {
+  let devTool = '',
+    externals = [],
     plugins = [new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       filename: 'vendor.js'
-    })];
-
-  let cssLoader = {
-    test: /\.css$/,
-    use: [
-      { loader: 'style-loader' },
-      { loader: 'css-loader' }
-    ]
-  };
-
-  let sassLoader = {
-    test: /\.scss$/,
-    use: [
-      { loader: 'style-loader' },
-      { loader: 'css-loader' },
-      { loader: 'sass-loader' }
-    ]
-  };
+    })],
+    cssLoader = null,
+    sassLoader = null;
 
   const appEntry = ['./app/src/app.js'];
 
-  if (!isDebug) {
+  if (isDebug) {
+    devTool = 'eval-source-map';
+
     plugins.push(new webpack.optimize.UglifyJsPlugin({
+      sourceMap: true,
+      mangle: false,
+      output: {
+        beautify: true,
+        comments: true,
+      },
       compress: {
-        unused: true,
+        unused: false,
         drop_console: false,
         warnings: false
-      },
+      }
+    }), new webpack.HotModuleReplacementPlugin());
+
+    cssLoader = {
+      test: /\.css$/,
+      use: [
+        { loader: 'style-loader' },
+        { loader: 'css-loader' }
+      ]
+    };
+  
+    sassLoader = {
+      test: /\.scss$/,
+      use: [
+        { loader: 'style-loader' },
+        { loader: 'css-loader' },
+        { loader: 'sass-loader' }
+      ]
+    };
+
+  } else {
+    devTool = 'source-map';
+
+    plugins.push(new webpack.optimize.UglifyJsPlugin({
       sourceMap: true,
       mangle: true,
-      beautify: false
+      output: {
+        beautify: false,
+        comments: false,
+      },
+      compress: {
+        unused: true,
+        drop_console: true,
+        warnings: true
+      }
+    }), new webpack.BannerPlugin({
+      banner: (options.banner || ''),
+      raw: true
     }));
 
     plugins.push(new ExtractTextPlugin('[name].css'));
 
     cssLoader = {
       test: /\.css$/,
-
       use: ExtractTextPlugin.extract({
         fallback: 'style-loader',
         use: ['css-loader']
@@ -59,17 +83,11 @@ function createConfig(isDebug) {
 
     sassLoader = {
       test: /\.scss$/,
-
       use: ExtractTextPlugin.extract({
         fallback: 'style-loader',
         use: ['css-loader', 'sass-loader']
       })
     };
-
-  } else {
-    plugins.push(new webpack.HotModuleReplacementPlugin());
-
-    // appEntry.splice(0, 0, 'webpack-hot-middleware/client');
   }
 
   return {
@@ -82,7 +100,7 @@ function createConfig(isDebug) {
 
     output: {
       filename: '[name].js',
-      path: path.join(dirname, 'build'),
+      path: path.join(dirName, 'build'),
       publicPath: '/build/'
     },
 
