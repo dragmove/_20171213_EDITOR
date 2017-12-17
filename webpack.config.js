@@ -21,7 +21,7 @@ function createConfig(isDebug, options = {banner: ''}) {
     devTool = 'eval-source-map';
 
     plugins.push(new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
+      sourceMap: false,
       mangle: false,
       output: {
         beautify: true,
