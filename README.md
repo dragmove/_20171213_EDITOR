@@ -1,1 +1,2 @@
-this is readme.md
+## License
+[MIT license](http://danro.mit-license.org/).
