@@ -58,7 +58,10 @@ $(function () {
     bold: null,
     italic: null,
     underline: null,
-    strike: null
+    strike: null,
+
+    undo: null,
+    redo: null
   };
 
   // iOS
@@ -84,6 +87,14 @@ $(function () {
       case 'strike' :
         nodes.strike = nodes.strike || nodes.toolbar.querySelector('.ql-strike');
         $(nodes.strike).trigger('click');
+        break;
+
+      case 'undo' :
+        editor.history.undo();
+        break;
+
+      case 'redo' :
+        editor.history.redo();
         break;
 
       case 'color' :
