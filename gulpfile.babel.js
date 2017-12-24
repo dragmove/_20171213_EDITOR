@@ -31,7 +31,7 @@ gulp.task('webpack-dev-server', function () {
   });
 });
 
-gulp.task('prod:build', function (callback) {
+gulp.task('build', function (callback) {
   const compiler = webpack(prodConfig);
 
   compiler.run((error, stats) => {
